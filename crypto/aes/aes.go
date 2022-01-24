@@ -13,6 +13,7 @@ func CBCEncrypt(plaintext, key []byte) ([]byte, error) {
 		return nil, err
 	}
 
+	// PKCS5Padding
 	blockSize := block.BlockSize()
 	padding := blockSize - len(plaintext)%blockSize
 	padBytes := bytes.Repeat([]byte{byte(padding)}, padding)
@@ -44,6 +45,7 @@ func CBCDecrypt(ciphertext, key []byte) ([]byte, error) {
 	plaintext := make([]byte, len(ciphertext))
 	blockMode.CryptBlocks(plaintext, ciphertext)
 
+	// PKCS5UnPadding
 	length := len(plaintext)
 	unPadding := int(plaintext[length-1])
 	plaintext = plaintext[:(length - unPadding)]
