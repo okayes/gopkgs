@@ -10,7 +10,6 @@ func TestEncryptDecryptBase64(t *testing.T) {
 	var key = "40F0EF24557E4BD99553B3B5FC4A2269"
 	pass := "99900000000"
 	//pass := []byte(strings.Repeat("9", (11+1)*100))
-	//pass := []byte("999000000009990000000099900000000999000000009990000000099900000000")
 	ciphertext, err := CBCEncryptBase64(pass, key)
 	if err != nil {
 		fmt.Println(err)
@@ -31,7 +30,6 @@ func TestEncryptDecrypt(t *testing.T) {
 	var key = []byte("40F0EF24557E4BD99553B3B5FC4A2269")
 	pass := []byte("99900000000")
 	//pass := []byte(strings.Repeat("9", (11+1)*100))
-	//pass := []byte("999000000009990000000099900000000999000000009990000000099900000000")
 	ciphertext, err := CBCEncrypt(pass, key)
 	if err != nil {
 		fmt.Println(err)
