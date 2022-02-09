@@ -5,6 +5,7 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"encoding/base64"
+	"errors"
 )
 
 func CBCEncrypt(plaintext, key []byte) ([]byte, error) {
@@ -48,7 +49,11 @@ func CBCDecrypt(ciphertext, key []byte) ([]byte, error) {
 	// PKCS5UnPadding
 	length := len(plaintext)
 	unPadding := int(plaintext[length-1])
-	plaintext = plaintext[:(length - unPadding)]
+	lenUnPadding := length - unPadding
+	if lenUnPadding < 0 {
+		return nil, errors.New("slice bounds out of range")
+	}
+	plaintext = plaintext[:lenUnPadding]
 	return plaintext, nil
 }
 
