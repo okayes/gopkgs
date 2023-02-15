@@ -43,6 +43,7 @@ func Init(option Option) {
 
 func Error(em string) {
 	log.Println(em)
+	log.Println(string(debug.Stack()))
 	if handle != nil {
 		handle(em)
 	}
