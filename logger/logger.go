@@ -10,7 +10,7 @@ import (
 var handle HandleFunc
 
 type Option struct {
-	writer io.Writer
+	Writer io.Writer
 	Handle HandleFunc
 }
 
@@ -20,7 +20,7 @@ func Init(option Option) {
 	handle = option.Handle
 
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
-	log.SetOutput(io.MultiWriter(option.writer, os.Stdout))
+	log.SetOutput(io.MultiWriter(option.Writer, os.Stdout))
 }
 
 func Error(em string) {
