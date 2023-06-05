@@ -3,7 +3,7 @@ package apollo
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"time"
@@ -52,7 +52,7 @@ func (c *Apollo) syncConfig() {
 	defer func() {
 		if err := recover(); err != nil {
 			em := fmt.Sprintf("sync apollo config panic: %s, url: %s", err, c.url)
-			logger.Error(em)
+			logger.ErrorMsg(em)
 		}
 	}()
 
@@ -60,15 +60,15 @@ func (c *Apollo) syncConfig() {
 	resp, err := http.Get(url)
 	if err != nil {
 		em := fmt.Sprintf("Get config from apollo error: %s, url: %s", err, url)
-		logger.Error(em)
+		logger.ErrorMsg(em)
 		return
 	}
 
 	defer resp.Body.Close()
-	bytes, err := ioutil.ReadAll(resp.Body)
+	bytes, err := io.ReadAll(resp.Body)
 	if err != nil {
 		em := fmt.Sprintf("Read body from apollo response error: %s", err)
-		logger.Error(em)
+		logger.ErrorMsg(em)
 		return
 	}
 
@@ -76,7 +76,7 @@ func (c *Apollo) syncConfig() {
 		err := json.Unmarshal(bytes, c.data)
 		if err != nil {
 			em := fmt.Sprintf("Unmarshal config from apollo response error: %s, data: %s", err, bytes)
-			logger.Error(em)
+			logger.ErrorMsg(em)
 			return
 		}
 
@@ -87,6 +87,6 @@ func (c *Apollo) syncConfig() {
 		c.releaseKey = c.data.ReleaseKey
 	} else if resp.StatusCode != http.StatusNotModified {
 		em := fmt.Sprintf("Get config from apollo error, response status code: %d", resp.StatusCode)
-		logger.Error(em)
+		logger.ErrorMsg(em)
 	}
 }

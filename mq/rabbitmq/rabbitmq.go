@@ -34,7 +34,7 @@ func (th *RabbitMQ) connect(isReconnect bool) {
 		conn, err := amqp.Dial(th.url)
 		if err != nil {
 			em := fmt.Sprintf("RabbitMQ dial error: %s, url: %s", err, th.url)
-			logger.Error(em)
+			logger.ErrorMsg(em)
 			time.Sleep(time.Second)
 			continue
 		}
@@ -42,7 +42,7 @@ func (th *RabbitMQ) connect(isReconnect bool) {
 		ch, err := conn.Channel()
 		if err != nil {
 			em := fmt.Sprintf("RabbitMQ open channel error: %s", err)
-			logger.Error(em)
+			logger.ErrorMsg(em)
 			time.Sleep(time.Second)
 			continue
 		}
@@ -50,7 +50,7 @@ func (th *RabbitMQ) connect(isReconnect bool) {
 		err = ch.Confirm(false)
 		if err != nil {
 			em := fmt.Sprintf("RabbitMQ set channel confirm error: %s", err)
-			logger.Error(em)
+			logger.ErrorMsg(em)
 			time.Sleep(time.Second)
 			continue
 		}
@@ -65,7 +65,7 @@ func (th *RabbitMQ) connect(isReconnect bool) {
 			th.ch = ch
 
 			em := fmt.Sprintf("RabbitMQ conn finish: %s", time.Now().Format("2006-01-02 15:04:05"))
-			logger.Error(em)
+			logger.ErrorMsg(em)
 			return
 		}
 	}
@@ -83,7 +83,7 @@ func (th *RabbitMQ) Publish(exchange string, routingKey string, message []byte, 
 	if err != nil && th.conn.IsClosed() {
 		if atomic.CompareAndSwapInt32(&th.ReconnectFlag, 0, 1) {
 			em := fmt.Sprintf("RabbitMQ conn is closed, error: %s", err)
-			logger.Error(em)
+			logger.ErrorMsg(em)
 			go th.connect(true)
 		}
 	}
@@ -95,14 +95,14 @@ func (th *RabbitMQ) Subscribe(queue string, prefetchCount int, handler func([]by
 	err := th.ch.Qos(prefetchCount, 0, false)
 	if err != nil {
 		em := fmt.Sprintf("RabbitMQ channel set Qos error: %s", err)
-		logger.Error(em)
+		logger.ErrorMsg(em)
 		return
 	}
 
 	messages, err := th.ch.Consume(queue, "", false, false, false, false, nil)
 	if err != nil {
 		em := fmt.Sprintf("RabbitMQ consume message error: %s", err)
-		logger.Error(em)
+		logger.ErrorMsg(em)
 		return
 	}
 
@@ -112,23 +112,23 @@ func (th *RabbitMQ) Subscribe(queue string, prefetchCount int, handler func([]by
 			err := th.ch.Ack(item.DeliveryTag, false)
 			if err != nil {
 				em := fmt.Sprintf("RabbitMQ channel ack error: %s, data: %s", err, item.Body)
-				logger.Error(em)
+				logger.ErrorMsg(em)
 			}
 		} else {
 			err := th.ch.Nack(item.DeliveryTag, false, true)
 			if err != nil {
 				em := fmt.Sprintf("RabbitMQ channel nack error: %s, data: %s", err, item.Body)
-				logger.Error(em)
+				logger.ErrorMsg(em)
 			}
 		}
 	}
 	em := fmt.Sprintf("RabbitMQ conn is closed, consumer exit")
-	logger.Error(em)
+	logger.ErrorMsg(em)
 
 	// reconnect
 	if th.conn.IsClosed() {
 		em := fmt.Sprintf("RabbitMQ conn is closed, begin reconnect")
-		logger.Error(em)
+		logger.ErrorMsg(em)
 		th.connect(true)
 		go th.Subscribe(queue, prefetchCount, handler)
 	}
@@ -142,6 +142,6 @@ func (th *RabbitMQ) Close() {
 	err := th.conn.Close()
 	if err != nil {
 		em := fmt.Sprintf("RabbitMQ close conn error: %s", err)
-		logger.Error(em)
+		logger.ErrorMsg(em)
 	}
 }
