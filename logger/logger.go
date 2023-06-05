@@ -23,7 +23,11 @@ func Init(option Option) {
 	log.SetOutput(io.MultiWriter(option.Writer, os.Stdout))
 }
 
-func Error(em string) {
+func Error(err error) {
+	ErrorMsg(err.Error())
+}
+
+func ErrorMsg(em string) {
 	log.Println(em)
 	log.Println(string(debug.Stack()))
 	if handle != nil {
