@@ -1,6 +1,7 @@
 package sqlserver
 
 import (
+	"database/sql"
 	"errors"
 	"log"
 	"time"
@@ -11,7 +12,8 @@ import (
 )
 
 type Database struct {
-	DB *gorm.DB
+	DB    *gorm.DB
+	SqlDB *sql.DB
 }
 
 func NewSQLServerDatabase(dbConn string) *Database {
@@ -39,7 +41,8 @@ func NewSQLServerDatabase(dbConn string) *Database {
 	sqlDB.SetConnMaxLifetime(time.Hour)
 
 	return &Database{
-		DB: db,
+		DB:    db,
+		SqlDB: sqlDB,
 	}
 }
 
